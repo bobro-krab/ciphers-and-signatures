@@ -28,16 +28,11 @@ func RSA_EncryptFile(filename string, r shifr.RSA) {
 		return
 	}
 
-	// for _, b := range bytes {
-	// 	encodedByte := shifr.RSA_Encrypt(b, r)
-	// 	encryptedFile.Write(encodedByte)
-	// }
-
 }
 
 func main() {
 	fmt.Println("hel")
 
-	shifr.Elgamal(3)
-
+	// shifr.Elgamal(3)
+	shifr.Shamir(24)
 }
