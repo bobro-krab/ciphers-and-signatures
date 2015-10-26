@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	// "zi/crypto"
 	"zi/shifr"
+	// "zi/crypto"
 )
 
 func RSA_EncryptFile(filename string, r shifr.RSA) {
@@ -33,6 +33,14 @@ func RSA_EncryptFile(filename string, r shifr.RSA) {
 func main() {
 	fmt.Println("hel")
 
-	// shifr.Elgamal(3)
-	shifr.Shamir(24)
+	var r shifr.RSA
+
+	shifr.RSA_Init(&r)
+	encrypted := shifr.RSA_Encrypt(5, r)
+	decrypted := shifr.RSA_Decrypt(encrypted, r)
+	fmt.Println("Rsa check", encrypted, decrypted, 5)
+
+	shifr.Elgamal(21)
+	// shifr.Shamir(24)
+
 }
