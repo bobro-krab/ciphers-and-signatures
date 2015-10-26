@@ -41,6 +41,7 @@ func main() {
 	fmt.Println("Rsa check", encrypted, decrypted, 5)
 
 	shifr.Elgamal(21)
-	// shifr.Shamir(24)
+
+	shifr.Shamir(24)
 
 }

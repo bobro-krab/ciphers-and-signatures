@@ -31,7 +31,7 @@ func Shamir(message int) int32 {
 	temp = crypto.Pow(temp, da, p)
 	temp = crypto.Pow(temp, db, p)
 
-	fmt.Println("Message is", temp)
+	fmt.Println("Shamir Message is", temp)
 
 	return 1
 }
