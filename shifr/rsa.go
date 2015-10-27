@@ -13,8 +13,9 @@ func init() {
 }
 
 type RSA struct {
-	N int
-	D int
+	BlockSize int
+	N         int
+	D         int
 
 	Phi int
 	C   int
