@@ -7,19 +7,29 @@ import (
 	// "zi/crypto"
 )
 
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+func DecryptFile(filename string, r shifr.Shifrator) {
+	file, err := os.Open(filename)
+}
+
 func EncryptFile(filename string, r shifr.Shifrator) {
 	r.Init()
 
 	file, err := os.Open(filename)
-	if err != nil {
-		return
-	}
+	check(err)
 	defer file.Close() // отложенное закрытие файла
 
 	encryptedFile, err := os.Create(filename + "." + r.FileType())
+	check(err)
 	defer encryptedFile.Close()
 
 	keyFile, err := os.Create(filename + "." + r.FileType() + ".key")
+	check(err)
 	defer keyFile.Close()
 
 	stat, err := file.Stat()

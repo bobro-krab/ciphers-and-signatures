@@ -61,7 +61,8 @@ func (r *RSA) FileType() string {
 }
 
 func (r *RSA) BlockSize() int {
-	return int(unsafe.Sizeof(int(4)) / unsafe.Sizeof(byte(1)))
+	// return int(unsafe.Sizeof(int(4)) / unsafe.Sizeof(byte(1)))
+	return 8
 }
 
 func (r *RSA) Init() {
