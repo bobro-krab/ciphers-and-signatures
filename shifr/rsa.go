@@ -4,9 +4,10 @@ import (
 	// "fmt"
 	// "math"
 	"bytes"
+	"encoding/binary"
 	"encoding/gob"
 	"math/rand"
-	"strconv"
+	// "strconv"
 	"time"
 	"unsafe"
 	"zi/crypto"
@@ -16,8 +17,9 @@ type Shifrator interface {
 	Init()
 	BlockSize() int
 	FileType() string
-	EncryptByte(byte) string
-	DecryptByte(string) byte
+
+	EncryptByte(byte) []byte
+	DecryptByte([]byte) byte
 
 	Key() []byte
 	SetKey([]byte)
@@ -61,8 +63,8 @@ func (r *RSA) FileType() string {
 }
 
 func (r *RSA) BlockSize() int {
-	// return int(unsafe.Sizeof(int(4)) / unsafe.Sizeof(byte(1)))
-	return 8
+	return int(unsafe.Sizeof(int(4)) / unsafe.Sizeof(byte(1)))
+	// return 8
 }
 
 func (r *RSA) Init() {
@@ -100,13 +102,15 @@ func (r *RSA) Init() {
 	// fmt.Println("C is", r.C)
 }
 
-func (r *RSA) EncryptByte(message byte) string {
+func (r *RSA) EncryptByte(message byte) []byte {
 	result := crypto.Pow(int(message), r.D, r.N)
-	return strconv.Itoa(result)
+	bs := make([]byte, r.BlockSize())
+	binary.LittleEndian.PutUint32(bs, uint32(result))
+	return bs
 }
 
-func (r *RSA) DecryptByte(message string) byte {
-	m, _ := strconv.Atoi(message)
-	result := crypto.Pow(m, int(r.C), int(r.N))
+func (r *RSA) DecryptByte(message []byte) byte {
+	m := binary.LittleEndian.Uint32(message)
+	result := crypto.Pow(int(m), int(r.C), int(r.N))
 	return byte(result)
 }
