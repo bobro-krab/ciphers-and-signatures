@@ -1,21 +1,35 @@
 package shifr
 
 import (
-	"fmt"
+	// "fmt"
 	// "math"
+	"bytes"
+	"encoding/gob"
 	"math/rand"
+	"strconv"
 	"time"
+	"unsafe"
 	"zi/crypto"
 )
+
+type Shifrator interface {
+	Init()
+	BlockSize() int
+	FileType() string
+	EncryptByte(byte) string
+	DecryptByte(string) byte
+
+	Key() []byte
+	SetKey([]byte)
+}
 
 func init() {
 	rand.Seed(int64(time.Now().Second()))
 }
 
 type RSA struct {
-	BlockSize int
-	N         int
-	D         int
+	N int
+	D int
 
 	Phi int
 	C   int
@@ -23,8 +37,34 @@ type RSA struct {
 	Q   int
 }
 
-func RSA_Init(in *RSA) {
-	var r RSA = *in
+func (r *RSA) Key() []byte {
+	b := bytes.Buffer{}
+	e := gob.NewEncoder(&b)
+	e.Encode(r)
+	return b.Bytes()
+}
+
+func (r *RSA) SetKey(key []byte) {
+	m := RSA{}
+	b := bytes.Buffer{}
+	b.Write(key)
+	d := gob.NewDecoder(&b)
+	err := d.Decode(&m)
+	if err != nil {
+		panic(err)
+	}
+	*r = m
+}
+
+func (r *RSA) FileType() string {
+	return "rsa"
+}
+
+func (r *RSA) BlockSize() int {
+	return int(unsafe.Sizeof(int(4)) / unsafe.Sizeof(byte(1)))
+}
+
+func (r *RSA) Init() {
 	r.N = 0
 	r.Phi = 0
 
@@ -33,13 +73,13 @@ func RSA_Init(in *RSA) {
 	for r.Q == r.P {
 		r.Q = int(crypto.GenPrime())
 	}
-	fmt.Println("P is", r.P, "Q is", r.Q)
+	// fmt.Println("P is", r.P, "Q is", r.Q)
 
 	r.N = r.P * r.Q
-	fmt.Println("N is", r.N)
+	// fmt.Println("N is", r.N)
 
 	r.Phi = (r.P - 1) * (r.Q - 1)
-	fmt.Println("phi is", r.Phi)
+	// fmt.Println("phi is", r.Phi)
 
 	r.D = 3
 	for {
@@ -48,24 +88,24 @@ func RSA_Init(in *RSA) {
 		}
 		r.D += 2
 	}
-	fmt.Println("D is", r.D)
+	// fmt.Println("D is", r.D)
 
 	// c is a secret key
 	_, r.C, _ = crypto.Euclid(r.D, r.Phi)
-	fmt.Println("calculaatig for ", r.D, r.Phi)
+	// fmt.Println("calculaatig for ", r.D, r.Phi)
 	if r.C < 0 {
 		r.C += r.Phi
 	}
-	fmt.Println("C is", r.C)
-	*in = r
+	// fmt.Println("C is", r.C)
 }
 
-func RSA_Encrypt(message byte, r RSA) int {
+func (r *RSA) EncryptByte(message byte) string {
 	result := crypto.Pow(int(message), r.D, r.N)
-	return result
+	return strconv.Itoa(result)
 }
 
-func RSA_Decrypt(message int, r RSA) byte {
-	result := crypto.Pow(message, int(r.C), int(r.N))
+func (r *RSA) DecryptByte(message string) byte {
+	m, _ := strconv.Atoi(message)
+	result := crypto.Pow(m, int(r.C), int(r.N))
 	return byte(result)
 }

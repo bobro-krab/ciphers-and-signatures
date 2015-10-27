@@ -7,21 +7,20 @@ import (
 	// "zi/crypto"
 )
 
-type Shifrator interface {
-	BlockSize()
-	EncryptByte(byte) string
-	DecryptByte(string) byte
-}
+func EncryptFile(filename string, r shifr.Shifrator) {
+	r.Init()
 
-func RSA_EncryptFile(filename string, r shifr.RSA) {
 	file, err := os.Open(filename)
 	if err != nil {
 		return
 	}
 	defer file.Close() // отложенное закрытие файла
 
-	encryptedFile, err := os.Open(filename + ".enc")
+	encryptedFile, err := os.Create(filename + "." + r.FileType())
 	defer encryptedFile.Close()
+
+	keyFile, err := os.Create(filename + "." + r.FileType() + ".key")
+	defer keyFile.Close()
 
 	stat, err := file.Stat()
 	if err != nil {
@@ -34,15 +33,22 @@ func RSA_EncryptFile(filename string, r shifr.RSA) {
 		return
 	}
 
+	var i int64 = 0
+	for i = 0; i < stat.Size(); i++ {
+		fmt.Print(string(bytes[i]))
+		encryptedFile.WriteString(r.EncryptByte(bytes[i]))
+	}
+	keyFile.Write(r.Key())
 }
 
 func main() {
-	fmt.Println("hel")
-
 	var r shifr.RSA
+	r.C = 15
+	EncryptFile("testfile", &r)
+	fmt.Println("r.c is", r.C)
 
-	shifr.RSA_Init(&r)
-	RSA_EncryptFile("testfile", r)
+	// shifr.RSA_Init(&r)
+	// RSA_EncryptFile("testfile", r)
 	// encrypted := shifr.RSA_Encrypt(5, r)
 	// decrypted := shifr.RSA_Decrypt(encrypted, r)
 	// fmt.Println("Rsa check", encrypted, decrypted, 5)
