@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"zi/shifr"
-	// "zi/crypto"
 )
 
 func check(e error) {
@@ -15,8 +14,6 @@ func check(e error) {
 }
 
 func DecryptFile(filename string, r shifr.Shifrator) {
-	// fmt.Println(filepath.Ext(filename))
-	// return
 	if filepath.Ext(filename) != "."+r.FileType() {
 		fmt.Println("wrong file to decrypt!")
 		return
@@ -38,7 +35,7 @@ func DecryptFile(filename string, r shifr.Shifrator) {
 	stat, _ := keyFile.Stat()
 	key := make([]byte, stat.Size())
 	keyFile.Read(key)
-	r.SetKey(key)
+	r.LoadKey(key)
 
 	stat, _ = encryptedFile.Stat()
 	bytes := make([]byte, stat.Size())
@@ -46,7 +43,10 @@ func DecryptFile(filename string, r shifr.Shifrator) {
 	var i int64 = 0
 	for i = 0; i < stat.Size(); i += int64(r.BlockSize()) {
 		db := r.DecryptByte(bytes[i : i+int64(r.BlockSize())])
-		origFile.WriteString(string(db))
+		// origFile.WriteString(string(db))
+		some := make([]byte, 1)
+		some[0] = db
+		origFile.Write(some)
 		fmt.Print(string(db))
 	}
 }
@@ -86,21 +86,18 @@ func EncryptFile(filename string, r shifr.Shifrator) {
 }
 
 func main() {
-	var r shifr.RSA
+	// var r shifr.RSA
+	// var r shifr.Elgamal
+	var r shifr.Vernam
+
+	EncryptFile(os.Args[1], &r)
+	DecryptFile(os.Args[1]+"."+r.FileType(), &r)
+	return
 
 	if len(os.Args) > 2 {
 		DecryptFile(os.Args[1], &r)
 	} else {
 		EncryptFile(os.Args[1], &r)
 	}
-
-	// shifr.RSA_Init(&r)
-	// RSA_EncryptFile("testfile", r)
-	// encrypted := shifr.RSA_Encrypt(5, r)
-	// decrypted := shifr.RSA_Decrypt(encrypted, r)
-	// fmt.Println("Rsa check", encrypted, decrypted, 5)
-	//
-	// shifr.Elgamal(21)
-	// shifr.Shamir(24)
 
 }

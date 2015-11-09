@@ -1,13 +1,10 @@
 package shifr
 
 import (
-	// "fmt"
-	// "math"
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
 	"math/rand"
-	// "strconv"
 	"time"
 	"unsafe"
 	"zi/crypto"
@@ -22,7 +19,7 @@ type Shifrator interface {
 	DecryptByte([]byte) byte
 
 	Key() []byte
-	SetKey([]byte)
+	LoadKey([]byte)
 }
 
 func init() {
@@ -46,7 +43,7 @@ func (r *RSA) Key() []byte {
 	return b.Bytes()
 }
 
-func (r *RSA) SetKey(key []byte) {
+func (r *RSA) LoadKey(key []byte) {
 	m := RSA{}
 	b := bytes.Buffer{}
 	b.Write(key)
