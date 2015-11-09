@@ -15,6 +15,7 @@ type Vernam struct {
 
 func (r *Vernam) Init() {
 	r.ByteKey = make([]byte, 0)
+	r.CurrentByte = 0
 }
 
 func (r *Vernam) FileType() string {
@@ -34,8 +35,8 @@ func (r *Vernam) EncryptByte(message byte) []byte {
 }
 
 func (r *Vernam) DecryptByte(b []byte) byte {
-	r.CurrentByte = 0
 	x := xor(r.ByteKey[r.CurrentByte], b[0])
+	// fmt.Println("current byte", r.CurrentByte)
 	r.CurrentByte += 1
 	return x
 }

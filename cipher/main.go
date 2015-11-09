@@ -43,6 +43,7 @@ func DecryptFile(filename string, r shifr.Shifrator) {
 	var i int64 = 0
 	for i = 0; i < stat.Size(); i += int64(r.BlockSize()) {
 		db := r.DecryptByte(bytes[i : i+int64(r.BlockSize())])
+		// fmt.Println("i", i)
 		// origFile.WriteString(string(db))
 		some := make([]byte, 1)
 		some[0] = db
@@ -89,10 +90,6 @@ func main() {
 	// var r shifr.RSA
 	// var r shifr.Elgamal
 	var r shifr.Vernam
-
-	EncryptFile(os.Args[1], &r)
-	DecryptFile(os.Args[1]+"."+r.FileType(), &r)
-	return
 
 	if len(os.Args) > 2 {
 		DecryptFile(os.Args[1], &r)
