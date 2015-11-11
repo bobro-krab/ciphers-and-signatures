@@ -43,12 +43,10 @@ func DecryptFile(filename string, r shifr.Shifrator) {
 	var i int64 = 0
 	for i = 0; i < stat.Size(); i += int64(r.BlockSize()) {
 		db := r.DecryptByte(bytes[i : i+int64(r.BlockSize())])
-		// fmt.Println("i", i)
-		// origFile.WriteString(string(db))
 		some := make([]byte, 1)
 		some[0] = db
 		origFile.Write(some)
-		fmt.Print(string(db))
+		// fmt.Print(string(db))
 	}
 }
 
@@ -80,21 +78,28 @@ func EncryptFile(filename string, r shifr.Shifrator) {
 
 	var i int64 = 0
 	for i = 0; i < stat.Size(); i++ {
-		fmt.Print(string(bytes[i]))
+		// fmt.Print(string(bytes[i]))
 		encryptedFile.Write(r.EncryptByte(bytes[i]))
 	}
 	keyFile.Write(r.Key())
 }
 
+type Variants []shifr.Shifrator
+
 func main() {
 	// var r shifr.RSA
 	// var r shifr.Elgamal
-	var r shifr.Vernam
+	// var r shifr.Vernam
 
-	if len(os.Args) > 2 {
-		DecryptFile(os.Args[1], &r)
+	x := make(map[string]shifr.Shifrator)
+	x["r"] = shifr.RSA{}
+	x["e"] = &shifr.Elgamal{}
+	x["v"] = &shifr.Vernam{}
+
+	if len(os.Args) > 3 {
+		DecryptFile(os.Args[1], x[os.Args[2]])
 	} else {
-		EncryptFile(os.Args[1], &r)
+		EncryptFile(os.Args[1], x[os.Args[2]])
 	}
 
 }
