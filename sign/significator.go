@@ -11,8 +11,8 @@ type Significator interface {
 }
 
 func SignupFile(filename string, s Significator) {
-	fileToSign := getBytesFromFile(filename)
-	hash := s.Checksum(fileToSign)
+	//fileToSign := getBytesFromFile(filename)
+	//hash := s.Checksum(fileToSign)
 }
 
 func CheckSign() bool {
