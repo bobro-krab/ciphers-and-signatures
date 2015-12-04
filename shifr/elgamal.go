@@ -31,6 +31,7 @@ func (r *Elgamal) EncryptByte(message byte) []byte {
 	if r.E < 0 {
 		r.E += r.P
 	}
+
 	firsthalf := make([]byte, r.BlockSize()/2)
 	secondhalf := make([]byte, r.BlockSize()/2)
 	binary.LittleEndian.PutUint32(firsthalf, uint32(r.E))
@@ -44,6 +45,7 @@ func (r *Elgamal) DecryptByte(message []byte) byte {
 	first := message[r.BlockSize()/2:]
 	r.E = int(binary.LittleEndian.Uint32(first))
 	r.R = int(binary.LittleEndian.Uint32(second))
+
 	temp := r.P - 1 - r.C
 	if temp < 0 {
 		temp += r.P

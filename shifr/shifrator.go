@@ -21,7 +21,7 @@ type Shifrator interface {
 /*
 Reads filename and save it containts into byte array
 */
-func getBytesFromFile(filename string) []byte {
+func GetBytesFromFile(filename string) []byte {
 	encryptedFile, err := os.Open(filename)
 	check(err)
 	defer encryptedFile.Close()

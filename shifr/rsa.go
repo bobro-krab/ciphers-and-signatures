@@ -4,23 +4,13 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
+	"hash/crc32"
 	"math/rand"
+	"strconv"
 	"time"
 	"unsafe"
 	"zi/crypto"
 )
-
-type Shifrator interface {
-	Init()
-	BlockSize() int
-	FileType() string
-
-	EncryptByte(byte) []byte
-	DecryptByte([]byte) byte
-
-	Key() []byte
-	LoadKey([]byte)
-}
 
 func init() {
 	rand.Seed(int64(time.Now().Second()))
@@ -61,7 +51,6 @@ func (r *RSA) FileType() string {
 
 func (r *RSA) BlockSize() int {
 	return int(unsafe.Sizeof(int(4)) / unsafe.Sizeof(byte(1)))
-	// return 8
 }
 
 func (r *RSA) Init() {
@@ -73,13 +62,9 @@ func (r *RSA) Init() {
 	for r.Q == r.P {
 		r.Q = int(crypto.GenPrime())
 	}
-	// fmt.Println("P is", r.P, "Q is", r.Q)
 
 	r.N = r.P * r.Q
-	// fmt.Println("N is", r.N)
-
 	r.Phi = (r.P - 1) * (r.Q - 1)
-	// fmt.Println("phi is", r.Phi)
 
 	r.D = 3
 	for {
@@ -88,15 +73,12 @@ func (r *RSA) Init() {
 		}
 		r.D += 2
 	}
-	// fmt.Println("D is", r.D)
 
 	// c is a secret key
 	_, r.C, _ = crypto.Euclid(r.D, r.Phi)
-	// fmt.Println("calculaatig for ", r.D, r.Phi)
 	if r.C < 0 {
 		r.C += r.Phi
 	}
-	// fmt.Println("C is", r.C)
 }
 
 func (r *RSA) EncryptByte(message byte) []byte {
@@ -110,4 +92,19 @@ func (r *RSA) DecryptByte(message []byte) byte {
 	m := binary.LittleEndian.Uint32(message)
 	result := crypto.Pow(int(m), int(r.C), int(r.N))
 	return byte(result)
+}
+
+// For interface Significator
+func (r *RSA) Checksum(file []byte) int {
+	return int(crc32.ChecksumIEEE(file))
+}
+
+func (r *RSA) GenSign(hash int) string {
+	s := crypto.Pow(hash, r.C, r.N)
+	return strconv.Itoa(s)
+}
+
+func (r *RSA) GetHashFromSign(sign int) string {
+	s := crypto.Pow(sign, r.D, r.N)
+	return strconv.Itoa(s)
 }
