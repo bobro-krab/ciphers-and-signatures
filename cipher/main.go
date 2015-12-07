@@ -11,7 +11,7 @@ func main() {
 	var r shifr.RSA
 	fmt.Println("Shifrator v0.1")
 	sign.SignupFile("testfile", &r)
-	sign.CheckSign("testfile", &r)
+	sign.CheckupSignature("testfile", &r)
 
 	return
 

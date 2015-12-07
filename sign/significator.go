@@ -1,9 +1,10 @@
 package sign
 
 import (
+	"encoding/gob"
 	"fmt"
+	"hash/crc32"
 	"os"
-	"strconv"
 	"zi/shifr"
 )
 
@@ -15,20 +16,23 @@ func check(e error) {
 
 type Significator interface {
 	Init()
-	Checksum(file []byte) int
 	GenSign(hash int) []int
-	GetHashFromSign(sign int) string
+	CheckSign(sign []int, fileHash int) bool // is signature valid
 	FileType() string
 
 	Key() []byte
 	LoadKey([]byte)
 }
 
+func Checksum(file []byte) int {
+	return int(crc32.ChecksumIEEE(file))
+}
+
 func SignupFile(filename string, s Significator) {
 	signatureFilename := filename + "." + s.FileType() + ".sign"
 	s.Init()
 	fileToSign := shifr.GetBytesFromFile(filename)
-	hash := s.Checksum(fileToSign)
+	hash := Checksum(fileToSign)
 	fmt.Println(filename, "hash is:", hash)
 	fmt.Println(filename, "sign is", s.GenSign(hash))
 	signatureFile, _ := os.Create(signatureFilename)
@@ -38,46 +42,38 @@ func SignupFile(filename string, s Significator) {
 	check(err)
 	defer keyFile.Close()
 
+	// save signature to separate file
 	keyFile.Write(s.Key())
-	signatureFile.WriteString(string(s.GenSign(hash)[0]))
+	encoder := gob.NewEncoder(signatureFile)
+	encoder.Encode(s.GenSign(hash))
 }
 
-func CheckSign(filename string, s Significator) bool {
+func CheckupSignature(filename string, s Significator) bool {
 	signatureFilename := filename + "." + s.FileType() + ".sign"
 	signFile, _ := os.Open(signatureFilename)
 	defer signFile.Close()
 
-	stat, _ := signFile.Stat()
-	signBytes := make([]byte, stat.Size())
-	signFile.Read(signBytes)
-	sign := string(signBytes)
+	decoder := gob.NewDecoder(signFile)
+	signature := []int{}
+	decoder.Decode(&signature)
+	for i := range signature {
+		fmt.Println("i:", i, "value:", signature[i])
+	}
 
 	fileBytes := shifr.GetBytesFromFile(filename)
-
-	fmt.Println(filename, "read sign is'", sign, "'")
-	temp, _ := strconv.Atoi(sign)
-	fmt.Println("temp is ", temp)
 
 	keyFile, err := os.Open(filename + "." + s.FileType() + ".key")
 	check(err)
 	defer keyFile.Close()
 
 	// read key, and set our setting to that
-	stat, _ = keyFile.Stat()
+	stat, _ := keyFile.Stat()
 	key := make([]byte, stat.Size())
 	keyFile.Read(key)
 	s.LoadKey(key)
 
-	hash1 := s.GetHashFromSign(int(temp))
-	hash2 := strconv.Itoa(s.Checksum(fileBytes))
-	fmt.Println("hash1 and hash2 is", hash1, hash2)
-	if hash1 == hash2 {
-		fmt.Println("Signature is right")
-		return true
-	} else {
-		fmt.Println("Signature is NOT right")
-		return false
-	}
-
-	return true
+	// CHECK FOR EQUALITY
+	result := s.CheckSign(signature, Checksum(fileBytes))
+	fmt.Println("result is ", result)
+	return result
 }

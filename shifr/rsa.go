@@ -4,9 +4,8 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
-	"hash/crc32"
+	"fmt"
 	"math/rand"
-	"strconv"
 	"time"
 	"unsafe"
 	"zi/crypto"
@@ -94,10 +93,9 @@ func (r *RSA) DecryptByte(message []byte) byte {
 	return byte(result)
 }
 
-// For interface Significator
-func (r *RSA) Checksum(file []byte) int {
-	return int(crc32.ChecksumIEEE(file))
-}
+//----------------------------------------------------
+// significator
+//----------------------------------------------------
 
 func (r *RSA) GenSign(hash int) []int {
 	s := crypto.Pow(hash, r.C, r.N)
@@ -106,7 +104,12 @@ func (r *RSA) GenSign(hash int) []int {
 	return result
 }
 
-func (r *RSA) GetHashFromSign(sign int) string {
-	s := crypto.Pow(sign, r.D, r.N)
-	return strconv.Itoa(s)
+func (r *RSA) CheckSign(sign []int, fileHash int) bool {
+	temp := sign[0]
+	a := crypto.Pow(temp, r.D, r.N)
+	b := fileHash
+	fmt.Println("RSA_Check_sign temp", temp)
+	fmt.Println("a", a)
+	fmt.Println("b", b)
+	return b == a
 }
