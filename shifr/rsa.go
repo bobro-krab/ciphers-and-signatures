@@ -99,9 +99,11 @@ func (r *RSA) Checksum(file []byte) int {
 	return int(crc32.ChecksumIEEE(file))
 }
 
-func (r *RSA) GenSign(hash int) string {
+func (r *RSA) GenSign(hash int) []int {
 	s := crypto.Pow(hash, r.C, r.N)
-	return strconv.Itoa(s)
+	result := make([]int, 1)
+	result[0] = s
+	return result
 }
 
 func (r *RSA) GetHashFromSign(sign int) string {

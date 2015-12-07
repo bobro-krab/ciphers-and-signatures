@@ -20,5 +20,4 @@ func main() {
 	} else {
 		shifr.EncryptFile(os.Args[1], &r)
 	}
-
 }

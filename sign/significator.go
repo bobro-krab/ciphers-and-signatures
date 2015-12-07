@@ -16,7 +16,7 @@ func check(e error) {
 type Significator interface {
 	Init()
 	Checksum(file []byte) int
-	GenSign(hash int) string
+	GenSign(hash int) []int
 	GetHashFromSign(sign int) string
 	FileType() string
 
@@ -39,21 +39,20 @@ func SignupFile(filename string, s Significator) {
 	defer keyFile.Close()
 
 	keyFile.Write(s.Key())
-	signatureFile.WriteString(s.GenSign(hash))
+	signatureFile.WriteString(string(s.GenSign(hash)[0]))
 }
 
 func CheckSign(filename string, s Significator) bool {
 	signatureFilename := filename + "." + s.FileType() + ".sign"
-
 	signFile, _ := os.Open(signatureFilename)
 	defer signFile.Close()
-
-	signedFileBytes := shifr.GetBytesFromFile(filename)
 
 	stat, _ := signFile.Stat()
 	signBytes := make([]byte, stat.Size())
 	signFile.Read(signBytes)
 	sign := string(signBytes)
+
+	fileBytes := shifr.GetBytesFromFile(filename)
 
 	fmt.Println(filename, "read sign is'", sign, "'")
 	temp, _ := strconv.Atoi(sign)
@@ -70,7 +69,7 @@ func CheckSign(filename string, s Significator) bool {
 	s.LoadKey(key)
 
 	hash1 := s.GetHashFromSign(int(temp))
-	hash2 := strconv.Itoa(s.Checksum(signedFileBytes))
+	hash2 := strconv.Itoa(s.Checksum(fileBytes))
 	fmt.Println("hash1 and hash2 is", hash1, hash2)
 	if hash1 == hash2 {
 		fmt.Println("Signature is right")
