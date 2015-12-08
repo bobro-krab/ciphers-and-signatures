@@ -78,6 +78,7 @@ func (r *RSA) Init() {
 	if r.C < 0 {
 		r.C += r.Phi
 	}
+	fmt.Println("INIT test C, D, 21:: ", r.C, r.D, crypto.Pow(crypto.Pow(21, r.C, r.N), r.D, r.N))
 }
 
 func (r *RSA) EncryptByte(message byte) []byte {
@@ -96,19 +97,34 @@ func (r *RSA) DecryptByte(message []byte) byte {
 //----------------------------------------------------
 // significator
 //----------------------------------------------------
+func printrsa(r *RSA) {
+	fmt.Println("\nPrinting RSA")
+	fmt.Println("C and D", r.C, r.D)
+	fmt.Println("P and Q", r.P, r.Q)
+	fmt.Println("N", r.N)
+	fmt.Println("Phi", r.Phi, "\n")
+}
 
 func (r *RSA) GenSign(hash int) []int {
+	printrsa(r)
+	hash %= r.N
+	fmt.Println("DEBUG hash is ", hash)
 	s := crypto.Pow(hash, r.C, r.N)
+	w := crypto.Pow(s, r.D, r.N)
+	if w < 0 {
+		w += r.N
+	}
+	fmt.Println("DEBUG W is ", w)
 	result := make([]int, 1)
 	result[0] = s
 	return result
 }
 
 func (r *RSA) CheckSign(sign []int, fileHash int) bool {
+	printrsa(r)
 	temp := sign[0]
 	a := crypto.Pow(temp, r.D, r.N)
-	b := fileHash
-	fmt.Println("RSA_Check_sign temp", temp)
+	b := fileHash % r.N
 	fmt.Println("a", a)
 	fmt.Println("b", b)
 	return b == a

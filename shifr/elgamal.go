@@ -99,7 +99,7 @@ func (r *Elgamal) GenSign(hash int) []int {
 	return result
 }
 
-func (r *Elgamal) CheckSign(sign []int) bool {
+func (r *Elgamal) CheckSign(sign []int, fileHash int) bool {
 	s := sign[0]
 	y := sign[1]
 	hash := sign[2]
@@ -109,8 +109,4 @@ func (r *Elgamal) CheckSign(sign []int) bool {
 		return true
 	}
 	return false
-}
-
-func (r *Elgamal) GetHashFromSign(sign int) string {
-	return "some"
 }

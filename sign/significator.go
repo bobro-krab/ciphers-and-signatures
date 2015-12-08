@@ -31,6 +31,7 @@ func Checksum(file []byte) int {
 func SignupFile(filename string, s Significator) {
 	signatureFilename := filename + "." + s.FileType() + ".sign"
 	s.Init()
+
 	fileToSign := shifr.GetBytesFromFile(filename)
 	hash := Checksum(fileToSign)
 	fmt.Println(filename, "hash is:", hash)
@@ -72,6 +73,7 @@ func CheckupSignature(filename string, s Significator) bool {
 	keyFile.Read(key)
 	s.LoadKey(key)
 
+	fmt.Println(filename, "checkup hash is:", Checksum(fileBytes))
 	// CHECK FOR EQUALITY
 	result := s.CheckSign(signature, Checksum(fileBytes))
 	fmt.Println("result is ", result)
