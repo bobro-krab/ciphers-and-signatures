@@ -35,31 +35,40 @@ func SignupFile(filename string, s Significator) {
 
 	fileToSign := shifr.GetBytesFromFile(filename)
 	hash := Checksum(fileToSign)
+	signature := s.GenSign(hash)
 	fmt.Println(filename, "hash is:", hash)
-	fmt.Println(filename, "sign is", s.GenSign(hash))
+	fmt.Println(filename, "sign is", signature)
 	signatureFile, _ := os.Create(signatureFilename)
 	defer signatureFile.Close()
 
+	// // save signature to separate file
+	// writer := bufio.NewWriter(signatureFile)
+	// for _, v := range signature {
+	// 	writer.WriteString(strconv.Itoa(v))
+	// }
+	// writer.WriteString("hello")
+
+	enc := gob.NewEncoder(signatureFile)
+	enc.Encode(signature)
+
+	// save key to file
 	keyFile, err := os.Create(filename + "." + s.FileType() + ".key")
 	check(err)
 	defer keyFile.Close()
-
-	// save signature to separate file
 	keyFile.Write(s.Key())
-	encoder := gob.NewEncoder(signatureFile)
-	encoder.Encode(s.GenSign(hash))
 }
 
 func CheckupSignature(filename string, s Significator) bool {
+	// read signature from file
 	signatureFilename := filename + "." + s.FileType() + ".sign"
 	signFile, _ := os.Open(signatureFilename)
 	defer signFile.Close()
+	signature := make([]int, 4)
+	dec := gob.NewDecoder(signFile)
+	dec.Decode(&signature)
 
-	decoder := gob.NewDecoder(signFile)
-	signature := []int{}
-	decoder.Decode(&signature)
-	for i := range signature {
-		fmt.Println("i:", i, "value:", signature[i])
+	for _, v := range signature {
+		fmt.Println("some ", v)
 	}
 
 	fileBytes := shifr.GetBytesFromFile(filename)
