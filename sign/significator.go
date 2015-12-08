@@ -29,6 +29,7 @@ func Checksum(file []byte) int {
 }
 
 func SignupFile(filename string, s Significator) {
+	fmt.Println("Signup file")
 	signatureFilename := filename + "." + s.FileType() + ".sign"
 	s.Init()
 

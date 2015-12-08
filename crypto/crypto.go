@@ -190,6 +190,7 @@ func GenPrime16() int16 {
 func GenPrime() int {
 	a := int(rand.Int())
 	for !Fermat(a) {
+		// fmt.Println("lol2", a)
 		a = int(rand.Int())
 	}
 	return a
@@ -201,7 +202,8 @@ func GenPair() (int, int) {
 	var q int = 0
 	var g int = 1
 	for 1 == 1 {
-		p = GenPrime()
+		fmt.Println("lol")
+		p = int(GenPrime16())
 		q = (p - 1) / 2
 		if Fermat(q) {
 			break
