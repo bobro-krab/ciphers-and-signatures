@@ -2,11 +2,17 @@ package main
 
 import (
 	"fmt"
+	"math/big"
 	"zi/shifr"
 	"zi/sign"
 )
 
 func main() {
+
+	// a := new(big.Int)
+	// fmt.Sscan("12345678901234567890", a)
+	// fmt.Println(a.String())
+	// return
 
 	var r shifr.Gost
 
