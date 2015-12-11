@@ -83,6 +83,14 @@ func BabystepGiantstep(a, module, y int) int {
 	return x
 }
 
+func Reverse(a, module int) int {
+	_, k_1, _ := Euclid(a, module)
+	if k_1 < 0 {
+		k_1 += module
+	}
+	return k_1
+}
+
 /*
    2) Функция, реализующая обобщённый алгоритм Евклида. Функция должна
       позволять находить наибольший общий делитель и обе неизвестных из
@@ -166,7 +174,14 @@ func Gcd(a int, b int) int {
 
 // test for prime number
 func Fermat(n int) bool {
+	if n <= 0 {
+		return false
+	}
+	if n <= 2 {
+		return true
+	}
 	for i := 0; i < 100; i++ {
+		// fmt.Println("Fermat n i", n, i)
 		var a int = 3
 		a = int(rand.Int())%(n-1) + 1
 		if Pow(a, n-1, n) != 1 {
@@ -177,6 +192,14 @@ func Fermat(n int) bool {
 		}
 	}
 	return true
+}
+
+func GenPrime8() int8 {
+	a := 64 + int8(rand.Int())
+	for !Fermat(int(a)) {
+		a = 64 + int8(rand.Int())
+	}
+	return a
 }
 
 func GenPrime16() int16 {

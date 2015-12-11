@@ -8,7 +8,7 @@ import (
 
 func main() {
 
-	var r shifr.Elgamal
+	var r shifr.Gost
 
 	fmt.Println("Shifrator v0.1")
 	sign.SignupFile("testfile", &r)

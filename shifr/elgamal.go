@@ -18,15 +18,6 @@ type Elgamal struct {
 func init() {
 	rand.Seed(int64(time.Now().Second()))
 }
-
-func (r *Elgamal) Init() {
-	fmt.Println("INIT")
-	r.P, r.G = crypto.GenPair()
-	r.C = rand.Int()%(r.P-2) + 1    // x in signature
-	r.D = crypto.Pow(r.G, r.C, r.P) // y in signature
-	fmt.Println("INIT DONE...")
-}
-
 func (r *Elgamal) BlockSize() int {
 	return int(unsafe.Sizeof(int(1)) * 2 / unsafe.Sizeof(byte(1)))
 }
@@ -85,34 +76,53 @@ func (r *Elgamal) LoadKey(key []byte) {
 	*r = m
 }
 
+func printgamal(r *Elgamal) {
+	fmt.Println("\nElgamal")
+	fmt.Println("P and G", r.P, r.G)
+	fmt.Println("C and D", r.C, r.D)
+	fmt.Println("E and R\n", r.E, r.R)
+}
+
+func mul(a, b, mod int) int {
+	return int(int64(int64(a)*int64(b)) % int64(mod))
+}
+
+func (r *Elgamal) Init() {
+	r.P, r.G = crypto.GenPair()
+	r.C = rand.Int()%(r.P-2) + 1    // x in signature
+	r.D = crypto.Pow(r.G, r.C, r.P) // y in signature
+}
+
 func (r *Elgamal) GenSign(hash int) []int {
-	fmt.Println("Generating sign")
+	fmt.Println("Generating sign...")
 	hash %= r.P
 
-	x := rand.Int()%(r.P-2) + 1
-	y := crypto.Pow(r.G, x, r.P) // public
-
 	k := rand.Int()%(r.P-2) + 1
+	for crypto.Gcd(k, r.P-1) != 1 {
+		k = rand.Int()%(r.P-2) + 1
+	}
 	R := crypto.Pow(r.G, k, r.P)
 
-	u := (hash - x*R%(r.P-1)) % (r.P - 1)
+	u := (hash - mul(r.C, R, r.P-1))
+	if u < 0 {
+		u += r.P - 1
+	}
 
-	_, k_1, _ := crypto.Euclid(k, r.P-1)
-	s := k_1 * u % (r.P - 1)
+	k_1 := crypto.Reverse(k, r.P-1)
+	s := mul(k_1, u, (r.P - 1))
 
 	result := make([]int, 3)
 	result[0] = s
-	result[1] = y
+	result[1] = r.D
 	result[2] = R
 	return result
 }
 
 func (r *Elgamal) CheckSign(sign []int, fileHash int) bool {
-	fmt.Println("Checking sign")
+	fileHash %= r.P
 	s := sign[0]
-	y := sign[1]
 	R := sign[2]
-	hash1 := crypto.Pow(r.D, y, r.P) * crypto.Pow(y, s, r.P) % r.P
-	hash2 := crypto.Pow(R, fileHash, r.P)
+	hash1 := (crypto.Pow(r.D, R, r.P) * crypto.Pow(R, s, r.P)) % r.P
+	hash2 := crypto.Pow(r.G, fileHash, r.P)
 	return hash1 == hash2
 }

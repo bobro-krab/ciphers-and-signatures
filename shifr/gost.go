@@ -35,10 +35,16 @@ func (r *Gost) Init() {
 	fmt.Println("Initialize")
 	r.P = 4
 	for !crypto.Fermat(r.P) {
-		r.Q = crypto.GenPrime()
-		r.B = rand.Int()
+		r.Q = int(crypto.GenPrime16())
+		// r.B = rand.Int() % 65536 // 16 bit random
+		r.B = rand.Int() % 256 // 24 bit random
+
+		if r.B < 0 {
+			continue
+		}
 		r.P = r.B*r.Q + 1
 	}
+	fmt.Println(r.P, r.Q, r.B)
 	fmt.Println("done")
 }
 
