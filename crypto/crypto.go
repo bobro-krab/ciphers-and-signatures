@@ -194,10 +194,10 @@ func Fermat(n int) bool {
 	return true
 }
 
-func GenPrime8() int8 {
-	a := 64 + int8(rand.Int())
+func GenPrime8() uint8 {
+	a := 128 + uint8(rand.Int())%128
 	for !Fermat(int(a)) {
-		a = 64 + int8(rand.Int())
+		a = 128 + uint8(rand.Int())%128
 	}
 	return a
 }

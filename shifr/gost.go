@@ -10,6 +10,7 @@ import (
 
 type Gost struct {
 	P, B, Q, D, E, R int
+	A                int
 }
 
 func (r *Gost) Key() []byte {
@@ -35,9 +36,8 @@ func (r *Gost) Init() {
 	fmt.Println("Initialize")
 	r.P = 4
 	for !crypto.Fermat(r.P) {
-		r.Q = int(crypto.GenPrime16())
-		// r.B = rand.Int() % 65536 // 16 bit random
-		r.B = rand.Int() % 256 // 24 bit random
+		r.Q = int(crypto.GenPrime8())
+		r.B = 16777216 + rand.Int()%16777216 // 24 bit random
 
 		if r.B < 0 {
 			continue
@@ -45,6 +45,13 @@ func (r *Gost) Init() {
 		r.P = r.B*r.Q + 1
 	}
 	fmt.Println(r.P, r.Q, r.B)
+	r.A = int(rand.Int())%r.P + 16777216
+	for crypto.Pow(r.A, r.Q, r.P) != 1 {
+		r.A += 1
+		fmt.Println("A, Q, Pow(a, q, p)", r.A, r.Q, crypto.Pow(r.A, r.Q, r.P))
+	}
+	fmt.Println("A:", r.A)
+
 	fmt.Println("done")
 }
 
