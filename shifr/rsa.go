@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/gob"
 	"fmt"
+	"hash/crc32"
 	"math/rand"
 	"time"
 	"unsafe"
@@ -13,6 +14,10 @@ import (
 
 func init() {
 	rand.Seed(int64(time.Now().Second()))
+}
+
+func Checksum(file []byte) int {
+	return int(crc32.ChecksumIEEE(file))
 }
 
 type RSA struct {
