@@ -28,32 +28,37 @@ type Clientushka struct {
 func main() {
 
 	fmt.Println("Money v0.1")
-	var bank shifr.RSA
+	// var bank []shifr.RSA
 	var client Clientushka
-	bank.Init()
+	values := [...]string{"100", "500", "1000", "5000", "1M"}
 
-	client.n = crypto.Random(2, bank.N-1)
+	bank := make([]shifr.RSA, 5)
 
-	client.r = crypto.Random(1, bank.N)
-	for crypto.Gcd(client.r, bank.N) != 1 {
-		client.r = crypto.Random(1, bank.N)
+	for i := 0; i < 5; i++ {
+		fmt.Println("Current value: ", values[i])
+		bank[i].Init()
+
+		// client side
+		client.n = crypto.Random(2, bank[i].N-1)
+		client.r = crypto.Random(1, bank[i].N)
+		for crypto.Gcd(client.r, bank[i].N) != 1 {
+			client.r = crypto.Random(1, bank[i].N)
+		}
+		nn := crypto.Mul(IntHash(client.n), crypto.Pow(client.r, bank[i].D, bank[i].N), bank[i].N)
+
+		// bank[i] side
+		ss := crypto.Pow(nn, bank[i].C, bank[i].N)
+
+		// Client side again
+		r_inverted := crypto.Reverse(client.r, bank[i].N)
+		s := crypto.Mul(ss, r_inverted, bank[i].N)
+
+		// bank[i] checks banknote
+		a := crypto.Pow(s, bank[i].D, bank[i].N)
+		b := IntHash(client.n)
+		fmt.Println("a", a)
+		fmt.Println("b", b)
 	}
-	nn := crypto.Mul(IntHash(client.n), crypto.Pow(client.r, bank.D, bank.N), bank.N)
-
-	// Bank side
-	ss := crypto.Pow(nn, bank.C, bank.N)
-
-	// Client side again
-	r_inverted := crypto.Reverse(client.r, bank.N)
-	s := crypto.Mul(ss, r_inverted, bank.N)
-
-	// Bank checks banknote
-	a := crypto.Pow(s, bank.D, bank.N)
-	b := IntHash(client.n)
-	fmt.Println("a", a)
-	fmt.Println("b", b)
-
-	fmt.Println("All given is ")
 
 	return
 
