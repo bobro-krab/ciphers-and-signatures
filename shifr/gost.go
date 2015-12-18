@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
-	"math/rand"
 	"zi/crypto"
 )
 
 type Gost struct {
 	P, B, Q, D, E, R int
-	A                int
+	A, G, X, Y       int
 }
 
 func (r *Gost) Key() []byte {
@@ -36,39 +35,65 @@ func (r *Gost) Init() {
 	fmt.Println("Initialize")
 	r.P = 4
 	for !crypto.Fermat(r.P) {
-		r.Q = int(crypto.GenPrime8())
-		r.B = 16777216 + rand.Int()%16777216 // 24 bit random
+		r.Q = crypto.GenPrimeBounds(63, 127)
+		r.B = crypto.Random(16777216, 33554432)
 
 		if r.B < 0 {
 			continue
 		}
 		r.P = r.B*r.Q + 1
 	}
+
 	fmt.Println(r.P, r.Q, r.B)
-	r.A = int(rand.Int())%r.P + 16777216
-	for crypto.Pow(r.A, r.Q, r.P) != 1 {
-		r.A += 1
-		fmt.Println("A, Q, Pow(a, q, p)", r.A, r.Q, crypto.Pow(r.A, r.Q, r.P))
+	r.A = 0
+	for 1 == 1 {
+		r.G = crypto.GenPrimeBounds(2, r.P)
+		r.A = crypto.Pow(r.G, r.B, r.P)
+		if crypto.Pow(r.A, r.Q, r.P) == 1 {
+			break
+		}
 	}
 	fmt.Println("A:", r.A)
-
-	fmt.Println("done")
+	r.X = crypto.Random(1, r.Q)
+	r.Y = crypto.Pow(r.A, r.X, r.P)
+	fmt.Println("Initialization complete")
 }
 
 func (r *Gost) GenSign(hash int) []int {
 
+	hash %= r.Q
+	R := 0
+	S := 0
+	for {
+		k := crypto.Random(1, r.Q)
+		R = crypto.Pow(r.A, k, r.P) % r.Q
+		if R == 0 {
+			fmt.Println("Bad R k", R, k)
+			continue
+		}
+		S = crypto.Mul(k, hash, r.Q) + crypto.Mul(r.X, R, r.Q)
+		if S == 0 {
+			fmt.Println("Bad R S k", R, S, k)
+			continue
+		}
+		break
+	}
 	result := make([]int, 3)
-	result[0] = 1
-	result[1] = 2
+	result[0] = R
+	result[1] = S
 	result[2] = 3
 	return result
 }
 
 func (r *Gost) CheckSign(sign []int, fileHash int) bool {
-	// s := sign[0]
-	// y := sign[1]
-	// R := sign[2]
-	return false
+	fileHash %= r.Q
+	R := sign[0]
+	S := sign[1]
+	hash_1 := crypto.Reverse(fileHash, r.Q)
+	u_1 := crypto.Mul(S, hash_1, r.Q)
+	u_2 := crypto.Mul(-R, hash_1, r.Q)
+	v := crypto.Mul(crypto.Pow(r.A, u_1, r.P), crypto.Pow(r.Y, u_2, r.P), r.P) % r.Q
+	return R == v
 }
 
 func (r *Gost) FileType() string {
