@@ -96,6 +96,9 @@ func (r *Elgamal) Init() {
 func (r *Elgamal) GenSign(hash int) []int {
 	fmt.Println("Generating sign...")
 	hash %= r.P
+	for hash < 0 {
+		hash += r.P
+	}
 
 	k := rand.Int()%(r.P-2) + 1
 	for crypto.Gcd(k, r.P-1) != 1 {
@@ -120,6 +123,9 @@ func (r *Elgamal) GenSign(hash int) []int {
 
 func (r *Elgamal) CheckSign(sign []int, fileHash int) bool {
 	fileHash %= r.P
+	for fileHash < 0 {
+		fileHash += r.P
+	}
 	s := sign[0]
 	R := sign[2]
 	hash1 := (crypto.Pow(r.D, R, r.P) * crypto.Pow(R, s, r.P)) % r.P

@@ -10,11 +10,6 @@ func main() {
 
 	fmt.Println("Shifrator v0.3")
 
-	fmt.Println("\n\nGOST")
-	var r shifr.Gost
-	sign.SignupFile("testfile", &r)
-	sign.CheckupSignature("testfile", &r)
-
 	var b shifr.RSA
 	fmt.Println("\n\nRSA")
 	sign.SignupFile("testfile", &b)
@@ -25,4 +20,8 @@ func main() {
 	sign.SignupFile("testfile", &c)
 	sign.CheckupSignature("testfile", &c)
 
+	fmt.Println("\n\nGOST")
+	var r shifr.Gost
+	sign.SignupFile("testfile", &r)
+	sign.CheckupSignature("testfile", &r)
 }

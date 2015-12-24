@@ -35,7 +35,7 @@ func main() {
 	bank := make([]shifr.RSA, 5)
 
 	for i := 0; i < 5; i++ {
-		fmt.Println("Current value: ", values[i])
+		fmt.Println("\nCurrent banknote: ", values[i])
 		bank[i].Init()
 
 		// client side
