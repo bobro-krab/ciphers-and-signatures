@@ -6,8 +6,16 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"zi/crypto"
 	"zi/shifr"
 )
+
+type Alice struct {
+	rsa shifr.RSA
+	G   Graph // Initial graph
+	H   Graph // Isomorphic graph
+	F   Graph // Encripted isomoprhic graph
+}
 
 type Graph struct {
 	N, M  int
@@ -50,20 +58,37 @@ func ReadGraph(filename string) Graph {
 	return G
 }
 
-type Alice struct {
-	rsa shifr.RSA
-	G   Graph // Initial graph
-	H   Graph // Isomorphic graph
-	F   Graph // Encripted isomoprhic graph
+// Load graph, and setups another graphs(morphing and encryption)
+func (alice Alice) LoadGraph(filename string) {
+	alice.rsa.Init()
+
+	// Loaded graph G
+	alice.G = ReadGraph(filename)
+	fmt.Println("Loaded graph:", alice.G)
+
+	// Isomorphing graph H
+	rand := crypto.Random(2, 1423)
+	alice.H = alice.G
+	for _, v := range alice.H.Edges {
+		v.a += rand
+		v.b += rand
+	}
+	fmt.Println("Mutate graph:", alice.H)
+
+	// Enncrypt graph
+	alice.F = alice.G
+	for _, v := range alice.F.Edges {
+		v.a = crypto.Pow(v.a, alice.rsa.D, alice.rsa.N)
+		v.b = crypto.Pow(v.b, alice.rsa.D, alice.rsa.N)
+	}
+	fmt.Println("Encrypted graph:", alice.F)
 }
 
 func main() {
 	fmt.Println("Graph v0.1")
 
 	var alice Alice
-	alice.rsa.Init()
-	alice.G = ReadGraph("input_graph")
-	fmt.Println(alice.G)
+	alice.LoadGraph("input_graph")
 
 	return
 }
