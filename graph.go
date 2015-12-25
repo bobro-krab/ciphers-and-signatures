@@ -69,19 +69,20 @@ func (alice Alice) LoadGraph(filename string) {
 	// Isomorphing graph H
 	rand := crypto.Random(2, 1423)
 	alice.H = alice.G
-	for _, v := range alice.H.Edges {
-		v.a += rand
-		v.b += rand
+	for i := range alice.H.Edges {
+		alice.H.Edges[i].a += rand
+		alice.H.Edges[i].b += rand
 	}
 	fmt.Println("Mutate graph:", alice.H)
 
 	// Enncrypt graph
 	alice.F = alice.G
-	for _, v := range alice.F.Edges {
-		v.a = crypto.Pow(v.a, alice.rsa.D, alice.rsa.N)
-		v.b = crypto.Pow(v.b, alice.rsa.D, alice.rsa.N)
+	for i := range alice.F.Edges {
+		alice.F.Edges[i].a = crypto.Pow(alice.F.Edges[i].a, alice.rsa.D, alice.rsa.N)
+		alice.F.Edges[i].b = crypto.Pow(alice.F.Edges[i].b, alice.rsa.D, alice.rsa.N)
 	}
 	fmt.Println("Encrypted graph:", alice.F)
+
 }
 
 func main() {
