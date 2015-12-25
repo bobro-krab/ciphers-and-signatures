@@ -84,6 +84,7 @@ func (r *RSA) Init() {
 		r.C += r.Phi
 	}
 	fmt.Println("RSA init C, D, 21:: ", r.C, r.D, crypto.Pow(crypto.Pow(21, r.C, r.N), r.D, r.N))
+	fmt.Println("P, Q, N:", r.P, r.Q, r.N)
 }
 
 func (r *RSA) EncryptByte(message byte) []byte {
