@@ -41,11 +41,23 @@ func (alice Alice) LoadGraph(filename string) {
 
 }
 
+// Answer for question 1
+func (alice Alice) GetCycle() graph.Graph {
+	dict := map[graph.Edge]graph.Edge{}
+	var M graph.Graph
+	M = alice.F
+	for k := range M.Edges {
+		dict[M.Edges[k]] = alice.H.Edges[k]
+	}
+	return M
+}
+
 func main() {
 	fmt.Println("Graph v0.1")
 
 	var alice Alice
 	alice.LoadGraph("input_graph")
+	fmt.Println(alice.GetCycle())
 
 	return
 }
