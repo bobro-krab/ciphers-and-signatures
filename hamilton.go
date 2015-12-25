@@ -59,5 +59,6 @@ func main() {
 	alice.LoadGraph("input_graph")
 	fmt.Println(alice.GetCycle())
 
+	fmt.Println(alice.GetCycle())
 	return
 }
