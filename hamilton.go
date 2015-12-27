@@ -64,7 +64,6 @@ func (alice *Alice) LoadGraph(filename string) {
 func (alice *Alice) GetCycle() graph.Graph {
 	var M graph.Graph
 	graph.Copy(&alice.H, &M)
-	fmt.Println("Making cycle:")
 	for k := range M.Edges {
 		if graph.IsEdgeInCycle(M.Edges[k], M.Cycle) {
 			continue
@@ -87,33 +86,35 @@ func main() {
 	alice.LoadGraph("input_graph")
 	G := alice.G // everybody knows
 
-	//question 2
-
-	H, permutation := alice.GetMutation()
-	for k := range H.Edges {
-		H.Edges[k].A -= permutation
-		H.Edges[k].B -= permutation
-	}
-	fmt.Println("Question 2\nG:\n", G)
-	fmt.Println("H permutated again:\n", H)
-	return
-
-	// question 1
-	var F graph.Graph
-	G = alice.GetCycle()
-	graph.Copy(&alice.F, &F)
-	for k := range G.Edges {
-		if graph.IsEdgeInCycle(G.Edges[k], G.Cycle) {
-			G.Edges[k].A = crypto.Pow(G.Edges[k].A, alice.rsa.D, alice.rsa.N)
-			G.Edges[k].B = crypto.Pow(G.Edges[k].B, alice.rsa.D, alice.rsa.N)
+	for i := 0; i < 1; i++ {
+		if crypto.Random(0, 2) == 0 {
+			//question 2
+			H, permutation := alice.GetMutation()
+			for k := range H.Edges {
+				H.Edges[k].A -= permutation
+				H.Edges[k].B -= permutation
+			}
+			fmt.Println("Question 2\nG:\n", G)
+			fmt.Println("H permutated again:\n", H)
 		} else {
-			continue
-		}
-		if G.Edges[k] != F.Edges[k] {
-			fmt.Println("HAMIlTON PATH IS INCORRECT!")
-			break
+			// question 1
+			var F graph.Graph
+			G = alice.GetCycle()
+			graph.Copy(&alice.F, &F)
+			for k := range G.Edges {
+				if graph.IsEdgeInCycle(G.Edges[k], G.Cycle) {
+					G.Edges[k].A = crypto.Pow(G.Edges[k].A, alice.rsa.D, alice.rsa.N)
+					G.Edges[k].B = crypto.Pow(G.Edges[k].B, alice.rsa.D, alice.rsa.N)
+				} else {
+					continue
+				}
+				if G.Edges[k] != F.Edges[k] {
+					fmt.Println("HAMIlTON PATH IS INCORRECT!")
+					break
+				}
+			}
+			fmt.Println("Question 1:")
 		}
 	}
-	fmt.Println("After checking question 1\n")
 	return
 }
