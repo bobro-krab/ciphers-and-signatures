@@ -46,10 +46,9 @@ func (alice *Alice) LoadGraph(filename string) {
 	for k := range alice.H.Cycle {
 		alice.H.Cycle[k] += rand
 	}
-	fmt.Println("Mutate graph:", alice.H)
 
 	// Enncrypt graph
-	alice.F = alice.H
+	graph.Copy(&alice.H, &alice.F)
 	for i := range alice.F.Edges {
 		alice.F.Edges[i].A = crypto.Pow(alice.F.Edges[i].A, alice.rsa.D, alice.rsa.N)
 		alice.F.Edges[i].B = crypto.Pow(alice.F.Edges[i].B, alice.rsa.D, alice.rsa.N)
@@ -62,10 +61,9 @@ func (alice *Alice) LoadGraph(filename string) {
 
 // Answer for question 1
 func (alice *Alice) GetCycle() graph.Graph {
-	// dict := map[graph.Edge]graph.Edge{}
 	var M graph.Graph
 	graph.Copy(&alice.H, &M)
-	fmt.Println("Making cycle:", M)
+	fmt.Println("Making cycle:")
 	for k := range M.Edges {
 		if graph.IsEdgeInCycle(M.Edges[k], M.Cycle) {
 			continue
