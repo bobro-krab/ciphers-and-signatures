@@ -14,8 +14,23 @@ type Alice struct {
 	F   graph.Graph // Encripted isomoprhic graph
 }
 
+func IsEdgeInCycle(e graph.Edge, cycle []int) bool {
+	for i := range cycle {
+		if i == 0 {
+			continue
+		}
+		if (e == graph.Edge{cycle[i], cycle[i-1]}) {
+			return true
+		}
+		if (e == graph.Edge{cycle[i-1], cycle[i]}) {
+			return true
+		}
+	}
+	return false
+}
+
 // Load graph, and setups another graphs(morphing and encryption)
-func (alice Alice) LoadGraph(filename string) {
+func (alice *Alice) LoadGraph(filename string) {
 	alice.rsa.Init()
 
 	// Loaded graph G
@@ -28,9 +43,13 @@ func (alice Alice) LoadGraph(filename string) {
 		alice.H.Edges[i].A += rand
 		alice.H.Edges[i].B += rand
 	}
+	for k := range alice.H.Cycle {
+		alice.H.Cycle[k] += rand
+	}
+	fmt.Println("Mutate graph:", alice.H)
 
 	// Enncrypt graph
-	graph.Copy(&alice.H, &alice.F)
+	alice.F = alice.H
 	for i := range alice.F.Edges {
 		alice.F.Edges[i].A = crypto.Pow(alice.F.Edges[i].A, alice.rsa.D, alice.rsa.N)
 		alice.F.Edges[i].B = crypto.Pow(alice.F.Edges[i].B, alice.rsa.D, alice.rsa.N)
