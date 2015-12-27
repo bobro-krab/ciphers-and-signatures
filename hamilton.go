@@ -8,10 +8,11 @@ import (
 )
 
 type Alice struct {
-	rsa shifr.RSA
-	G   graph.Graph // Initial graph
-	H   graph.Graph // Isomorphic graph
-	F   graph.Graph // Encripted isomoprhic graph
+	rsa  shifr.RSA
+	G    graph.Graph // Initial graph
+	H    graph.Graph // Isomorphic graph
+	F    graph.Graph // Encripted isomoprhic graph
+	rand int
 }
 
 func IsEdgeInCycle(e graph.Edge, cycle []int) bool {
@@ -37,14 +38,14 @@ func (alice *Alice) LoadGraph(filename string) {
 	alice.G = graph.ReadGraph(filename)
 
 	// Isomorphing graph H
-	rand := crypto.Random(2, 1423)
+	alice.rand = crypto.Random(2, 1423)
 	graph.Copy(&alice.G, &alice.H) // from g to h
 	for i := range alice.H.Edges {
-		alice.H.Edges[i].A += rand
-		alice.H.Edges[i].B += rand
+		alice.H.Edges[i].A += alice.rand
+		alice.H.Edges[i].B += alice.rand
 	}
 	for k := range alice.H.Cycle {
-		alice.H.Cycle[k] += rand
+		alice.H.Cycle[k] += alice.rand
 	}
 
 	// Enncrypt graph
@@ -75,14 +76,31 @@ func (alice *Alice) GetCycle() graph.Graph {
 	return M
 }
 
+func (alice *Alice) GetMutation() (graph.Graph, int) {
+	return alice.H, alice.rand
+}
+
 func main() {
 	fmt.Println("Graph v0.1")
 
 	var alice Alice
 	alice.LoadGraph("input_graph")
+	G := alice.G // everybody knows
 
+	//question 2
+
+	H, permutation := alice.GetMutation()
+	for k := range H.Edges {
+		H.Edges[k].A -= permutation
+		H.Edges[k].B -= permutation
+	}
+	fmt.Println("Question 2\nG:\n", G)
+	fmt.Println("H permutated again:\n", H)
+	return
+
+	// question 1
 	var F graph.Graph
-	G := alice.GetCycle()
+	G = alice.GetCycle()
 	graph.Copy(&alice.F, &F)
 	for k := range G.Edges {
 		if graph.IsEdgeInCycle(G.Edges[k], G.Cycle) {
