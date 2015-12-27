@@ -11,6 +11,12 @@ func init() {
 	rand.Seed(int64(time.Now().Second()))
 }
 
+func Random(lower, upper int) int {
+	result := rand.Int()%upper + lower
+	// fmt.Println("Random generated", result)
+	return result
+}
+
 func Pow64(A, B, Module int64) int64 {
 	a := A
 	b := B
@@ -194,10 +200,10 @@ func Fermat(n int) bool {
 	return true
 }
 
-func GenPrime8() int8 {
-	a := 64 + int8(rand.Int())
+func GenPrime8() uint8 {
+	a := 128 + uint8(rand.Int())%128
 	for !Fermat(int(a)) {
-		a = 64 + int8(rand.Int())
+		a = 128 + uint8(rand.Int())%128
 	}
 	return a
 }
@@ -206,6 +212,14 @@ func GenPrime16() int16 {
 	a := int16(rand.Int())
 	for !Fermat(int(a)) {
 		a = int16(rand.Int())
+	}
+	return a
+}
+
+func GenPrimeBounds(lower, upper int) int {
+	a := Random(lower, upper)
+	for !Fermat(a) {
+		a = Random(lower, upper)
 	}
 	return a
 }

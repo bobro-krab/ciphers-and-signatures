@@ -15,11 +15,11 @@ func check(e error) {
 }
 
 type Significator interface {
-	Init()
 	GenSign(hash int) []int
 	CheckSign(sign []int, fileHash int) bool // is signature valid
-	FileType() string
 
+	FileType() string
+	Init()
 	Key() []byte
 	LoadKey([]byte)
 }

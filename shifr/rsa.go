@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/gob"
 	"fmt"
+	"hash/crc32"
 	"math/rand"
 	"time"
 	"unsafe"
@@ -13,6 +14,10 @@ import (
 
 func init() {
 	rand.Seed(int64(time.Now().Second()))
+}
+
+func Checksum(file []byte) int {
+	return int(crc32.ChecksumIEEE(file))
 }
 
 type RSA struct {
@@ -78,7 +83,8 @@ func (r *RSA) Init() {
 	if r.C < 0 {
 		r.C += r.Phi
 	}
-	fmt.Println("INIT test C, D, 21:: ", r.C, r.D, crypto.Pow(crypto.Pow(21, r.C, r.N), r.D, r.N))
+	fmt.Println("RSA init C, D, 21:: ", r.C, r.D, crypto.Pow(crypto.Pow(21, r.C, r.N), r.D, r.N))
+	fmt.Println("P, Q, N:", r.P, r.Q, r.N)
 }
 
 func (r *RSA) EncryptByte(message byte) []byte {
@@ -106,7 +112,7 @@ func printrsa(r *RSA) {
 }
 
 func (r *RSA) GenSign(hash int) []int {
-	printrsa(r)
+	// printrsa(r)
 	hash %= r.N
 	fmt.Println("DEBUG hash is ", hash)
 	s := crypto.Pow(hash, r.C, r.N)
@@ -121,7 +127,7 @@ func (r *RSA) GenSign(hash int) []int {
 }
 
 func (r *RSA) CheckSign(sign []int, fileHash int) bool {
-	printrsa(r)
+	// printrsa(r)
 	temp := sign[0]
 	a := crypto.Pow(temp, r.D, r.N)
 	b := fileHash % r.N
