@@ -43,11 +43,17 @@ func (alice Alice) LoadGraph(filename string) {
 
 // Answer for question 1
 func (alice *Alice) GetCycle() graph.Graph {
-	dict := map[graph.Edge]graph.Edge{}
+	// dict := map[graph.Edge]graph.Edge{}
 	var M graph.Graph
-	M = alice.F
+	graph.Copy(&alice.H, &M)
+	fmt.Println("Making cycle:", M)
 	for k := range M.Edges {
-		dict[M.Edges[k]] = alice.H.Edges[k]
+		if graph.IsEdgeInCycle(M.Edges[k], M.Cycle) {
+			continue
+		} else {
+			M.Edges[k].A = crypto.Pow(M.Edges[k].A, alice.rsa.D, alice.rsa.N)
+			M.Edges[k].B = crypto.Pow(M.Edges[k].B, alice.rsa.D, alice.rsa.N)
+		}
 	}
 	return M
 }
@@ -57,8 +63,6 @@ func main() {
 
 	var alice Alice
 	alice.LoadGraph("input_graph")
-	fmt.Println(alice.GetCycle())
-
 	fmt.Println(alice.GetCycle())
 	return
 }

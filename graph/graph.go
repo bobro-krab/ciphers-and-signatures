@@ -17,6 +17,21 @@ type Edge struct {
 	A, B int
 }
 
+func IsEdgeInCycle(e Edge, cycle []int) bool {
+	for k := range cycle {
+		if k == 0 {
+			continue
+		}
+		if e.A == cycle[k] && e.B == cycle[k-1] {
+			return true
+		}
+		if e.A == cycle[k-1] && e.B == cycle[k] {
+			return true
+		}
+	}
+	return false
+}
+
 func Copy(from, to *Graph) {
 	to.M = from.M
 	to.N = from.N
