@@ -17,6 +17,19 @@ type Edge struct {
 	A, B int
 }
 
+func Copy(from, to *Graph) {
+	to.M = from.M
+	to.N = from.N
+	to.Cycle = make([]int, 0)
+	for _, v := range from.Cycle {
+		to.Cycle = append(to.Cycle, v)
+	}
+	to.Edges = make([]Edge, 0)
+	for _, v := range from.Edges {
+		to.Edges = append(to.Edges, v)
+	}
+}
+
 // ReadInts reads whitespace-separated ints from r. If there's an error, it
 // returns the ints successfully read so far as well as the error value.
 func ReadInts(r io.Reader) ([]int, error) {
