@@ -80,6 +80,22 @@ func main() {
 
 	var alice Alice
 	alice.LoadGraph("input_graph")
-	fmt.Println(alice.GetCycle())
+
+	var F graph.Graph
+	G := alice.GetCycle()
+	graph.Copy(&alice.F, &F)
+	for k := range G.Edges {
+		if graph.IsEdgeInCycle(G.Edges[k], G.Cycle) {
+			G.Edges[k].A = crypto.Pow(G.Edges[k].A, alice.rsa.D, alice.rsa.N)
+			G.Edges[k].B = crypto.Pow(G.Edges[k].B, alice.rsa.D, alice.rsa.N)
+		} else {
+			continue
+		}
+		if G.Edges[k] != F.Edges[k] {
+			fmt.Println("HAMIlTON PATH IS INCORRECT!")
+			break
+		}
+	}
+	fmt.Println("After checking question 1\n")
 	return
 }
