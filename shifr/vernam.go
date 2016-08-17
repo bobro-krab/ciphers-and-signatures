@@ -1,10 +1,6 @@
 package shifr
 
 import (
-	// "fmt"
-	// "zi/crypto"
-	// "bytes"
-
 	"math/rand"
 )
 
@@ -36,7 +32,6 @@ func (r *Vernam) EncryptByte(message byte) []byte {
 
 func (r *Vernam) DecryptByte(b []byte) byte {
 	x := xor(r.ByteKey[r.CurrentByte], b[0])
-	// fmt.Println("current byte", r.CurrentByte)
 	r.CurrentByte += 1
 	return x
 }

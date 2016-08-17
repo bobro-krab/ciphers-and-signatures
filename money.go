@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	// "zi/money"
 	"zi/crypto"
 	"zi/shifr"
 )
@@ -28,7 +27,6 @@ type Clientushka struct {
 func main() {
 
 	fmt.Println("Money v0.1")
-	// var bank []shifr.RSA
 	var client Clientushka
 	values := [...]string{"100", "500", "1000", "5000", "1M"}
 
@@ -38,7 +36,7 @@ func main() {
 		fmt.Println("\nCurrent banknote: ", values[i])
 		bank[i].Init()
 
-		// client side
+		// client side, encrypt banknote
 		client.n = crypto.Random(2, bank[i].N-1)
 		client.r = crypto.Random(1, bank[i].N)
 		for crypto.Gcd(client.r, bank[i].N) != 1 {
@@ -46,14 +44,14 @@ func main() {
 		}
 		nn := crypto.Mul(IntHash(client.n), crypto.Pow(client.r, bank[i].D, bank[i].N), bank[i].N)
 
-		// bank[i] side
+		// bank[i] side, encrypt with bank key
 		ss := crypto.Pow(nn, bank[i].C, bank[i].N)
 
-		// Client side again
+		// Client side again, decrypte bankote
 		r_inverted := crypto.Reverse(client.r, bank[i].N)
 		s := crypto.Mul(ss, r_inverted, bank[i].N)
 
-		// bank[i] checks banknote
+		// bank[i] checks banknote, for its authenticity
 		a := crypto.Pow(s, bank[i].D, bank[i].N)
 		b := IntHash(client.n)
 		fmt.Println("a", a)

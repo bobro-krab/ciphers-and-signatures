@@ -11,6 +11,7 @@ import (
 	"zi/crypto"
 )
 
+// implements shifrator and significator
 type Elgamal struct {
 	P, G, C, D, E, R int
 }
