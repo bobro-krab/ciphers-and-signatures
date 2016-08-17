@@ -1,12 +1,10 @@
-package main
+package graph
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"strconv"
-	"zi/shifr"
 )
 
 type Graph struct {
@@ -16,7 +14,35 @@ type Graph struct {
 }
 
 type Edge struct {
-	a, b int
+	A, B int
+}
+
+func IsEdgeInCycle(e Edge, cycle []int) bool {
+	for k := range cycle {
+		if k == 0 {
+			continue
+		}
+		if e.A == cycle[k] && e.B == cycle[k-1] {
+			return true
+		}
+		if e.A == cycle[k-1] && e.B == cycle[k] {
+			return true
+		}
+	}
+	return false
+}
+
+func Copy(from, to *Graph) {
+	to.M = from.M
+	to.N = from.N
+	to.Cycle = make([]int, 0)
+	for _, v := range from.Cycle {
+		to.Cycle = append(to.Cycle, v)
+	}
+	to.Edges = make([]Edge, 0)
+	for _, v := range from.Edges {
+		to.Edges = append(to.Edges, v)
+	}
 }
 
 // ReadInts reads whitespace-separated ints from r. If there's an error, it
@@ -48,22 +74,4 @@ func ReadGraph(filename string) Graph {
 		G.Edges = append(G.Edges, Edge{Ints[i], Ints[i+1]})
 	}
 	return G
-}
-
-type Alice struct {
-	rsa shifr.RSA
-	G   Graph // Initial graph
-	H   Graph // Isomorphic graph
-	F   Graph // Encripted isomoprhic graph
-}
-
-func main() {
-	fmt.Println("Graph v0.1")
-
-	var alice Alice
-	alice.rsa.Init()
-	alice.G = ReadGraph("input_graph")
-	fmt.Println(alice.G)
-
-	return
 }
