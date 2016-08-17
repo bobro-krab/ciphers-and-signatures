@@ -112,7 +112,6 @@ func printrsa(r *RSA) {
 }
 
 func (r *RSA) GenSign(hash int) []int {
-	// printrsa(r)
 	hash %= r.N
 	fmt.Println("DEBUG hash is ", hash)
 	s := crypto.Pow(hash, r.C, r.N)
@@ -127,7 +126,6 @@ func (r *RSA) GenSign(hash int) []int {
 }
 
 func (r *RSA) CheckSign(sign []int, fileHash int) bool {
-	// printrsa(r)
 	temp := sign[0]
 	a := crypto.Pow(temp, r.D, r.N)
 	b := fileHash % r.N

@@ -1,3 +1,6 @@
+/*
+Basic functions for crytpoalgorithms.
+*/
 package crypto
 
 import (
@@ -13,7 +16,6 @@ func init() {
 
 func Random(lower, upper int) int {
 	result := rand.Int()%upper + lower
-	// fmt.Println("Random generated", result)
 	return result
 }
 
@@ -41,9 +43,7 @@ func Mul(A, B, module int) int {
 	return int((a * b) % int64(module))
 }
 
-/*
-   1) Функция быстрого возведения числа в степень по модулю.
-*/
+// Fast A power B by module
 func Pow(A, B int, Module int) int {
 	a := int64(A)
 	b := int64(B)
@@ -61,10 +61,6 @@ func Pow(A, B int, Module int) int {
 	return int(result)
 }
 
-/*
-   4) Функция, которая решает задачу нахождения дискретного логарифма при
-      помощи алгоритма «Шаг младенца, шаг великана».
-*/
 func BabystepGiantstep(a, module, y int) int {
 	fmt.Println("A is", a, ", module is", module, ", y is", y)
 	k := int(math.Sqrt(float64(module))) + 1
@@ -97,11 +93,6 @@ func Reverse(a, module int) int {
 	return k_1
 }
 
-/*
-   2) Функция, реализующая обобщённый алгоритм Евклида. Функция должна
-      позволять находить наибольший общий делитель и обе неизвестных из
-      уравнения.
-*/
 func Euclid(a, b int) (int, int, int) {
 	U := [3]int{a, 1, 0}
 	V := [3]int{b, 0, 1}
@@ -128,10 +119,6 @@ func Euclid64(a, b int64) (int64, int64, int64) {
 	return U[0], U[1], U[2]
 }
 
-/*
-   3) Функция построения общего ключа для двух абонентов по схеме Диффи-
-      Хеллмана
-*/
 func DiffyHelman() {
 	// choosing module
 	module := GenPrime()
@@ -178,7 +165,7 @@ func Gcd(a int, b int) int {
 	return a
 }
 
-// test for prime number
+// Test for prime number
 func Fermat(n int) bool {
 	if n <= 0 {
 		return false
@@ -187,7 +174,6 @@ func Fermat(n int) bool {
 		return true
 	}
 	for i := 0; i < 100; i++ {
-		// fmt.Println("Fermat n i", n, i)
 		var a int = 3
 		a = int(rand.Int())%(n-1) + 1
 		if Pow(a, n-1, n) != 1 {

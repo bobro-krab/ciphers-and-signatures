@@ -19,7 +19,7 @@ type Shifrator interface {
 }
 
 /*
-Reads filename and save it containts into byte array
+Reads filename and convert it into byte array
 */
 func GetBytesFromFile(filename string) []byte {
 	encryptedFile, err := os.Open(filename)
@@ -72,7 +72,6 @@ func DecryptFile(filename string, r Shifrator) {
 		some := make([]byte, 1)
 		some[0] = db
 		origFile.Write(some)
-		// fmt.Print(string(db))
 	}
 }
 
@@ -81,7 +80,7 @@ func EncryptFile(filename string, r Shifrator) {
 
 	file, err := os.Open(filename)
 	check(err)
-	defer file.Close() // отложенное закрытие файла
+	defer file.Close()
 
 	encryptedFile, err := os.Create(filename + "." + r.FileType())
 	check(err)
@@ -104,7 +103,6 @@ func EncryptFile(filename string, r Shifrator) {
 
 	var i int64 = 0
 	for i = 0; i < stat.Size(); i++ {
-		// fmt.Print(string(bytes[i]))
 		encryptedFile.Write(r.EncryptByte(bytes[i]))
 	}
 	keyFile.Write(r.Key())

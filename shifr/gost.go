@@ -109,5 +109,5 @@ func (r *Gost) CheckSign(sign []int, fileHash int) bool {
 }
 
 func (r *Gost) FileType() string {
-	return "elg"
+	return "gost"
 }

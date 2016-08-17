@@ -7,8 +7,9 @@ import (
 )
 
 const deck_size = 52
-const suits_count = 4 // количество мастей
-const card_shift = 3  // чтобы не шифровать 0 и 1
+const suits_count = 4 
+const card_shift = 3 // 0 and 1 is numbers, that persistent to any
+// encryption and decryption, so we shift it by this constant.
 
 func init() {
 	fmt.Println("Initialized")
@@ -94,18 +95,6 @@ func (Table *PokerTable) Play() {
 		}
 		fmt.Println(player, "player card is", GetCard(Table.Taken[player]))
 	}
-
-	// // Decrypt your own card
-	// for player := 0; player < Table.PlayerCount; player++ {
-	// 	playerCard := Table.Cards[player]
-	// 	j := player
-	// 	for i := 0; i < Table.PlayerCount-1; i++ {
-	// 		playerCard = crypto.Pow(playerCard, Table.DKeys[j], Table.P)
-	// 		j = (j + 1) % Table.PlayerCount
-	// 	}
-	// 	playerCard = crypto.Pow(playerCard, Table.DKeys[player], Table.P)
-	// 	fmt.Println(player, "player card is", playerCard)
-	// }
 
 	fmt.Println("cards ", Table.Cards)
 }

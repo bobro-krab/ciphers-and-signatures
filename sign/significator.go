@@ -37,17 +37,10 @@ func SignupFile(filename string, s Significator) {
 	hash := Checksum(fileToSign)
 	signature := s.GenSign(hash)
 	fmt.Println(filename, "hash is:", hash)
-	// fmt.Println(filename, "sign is", signature)
 	signatureFile, _ := os.Create(signatureFilename)
 	defer signatureFile.Close()
 
-	// // save signature to separate file
-	// writer := bufio.NewWriter(signatureFile)
-	// for _, v := range signature {
-	// 	writer.WriteString(strconv.Itoa(v))
-	// }
-	// writer.WriteString("hello")
-
+	// save signature to separate file
 	enc := gob.NewEncoder(signatureFile)
 	enc.Encode(signature)
 
@@ -66,10 +59,6 @@ func CheckupSignature(filename string, s Significator) bool {
 	signature := make([]int, 4)
 	dec := gob.NewDecoder(signFile)
 	dec.Decode(&signature)
-
-	// for _, v := range signature {
-	// 	fmt.Println("some ", v)
-	// }
 
 	fileBytes := shifr.GetBytesFromFile(filename)
 

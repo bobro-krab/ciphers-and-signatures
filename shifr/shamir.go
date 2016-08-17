@@ -6,7 +6,8 @@ import (
 	"zi/crypto"
 )
 
-// инврсия не может существовать, если она не взаимно проста с модулем
+// There is no invert number, if number
+// is not relatively prime
 func Shamir_gen(module int) (int, int) {
 	c := rand.Int()
 	for crypto.Gcd(c, module) != 1 {
