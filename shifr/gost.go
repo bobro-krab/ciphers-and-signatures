@@ -2,7 +2,6 @@ package shifr
 
 import (
 	"bytes"
-	"crypto/rand"
 	"encoding/gob"
 	"fmt"
 	"zi/crypto"
@@ -32,52 +31,9 @@ func (r *Gost) LoadKey(key []byte) {
 	*r = m
 }
 
-func Pow(A, B, Module big.Int) big.Int {
-	a := A
-	b := B
-	module := Module
-	var result big.Int = 1
-	step_count := int(math.Log2(float64(b)))
-	for i := 0; i <= step_count; i++ {
-		if b%2 == 1 {
-			result = (result * a) % module
-		}
-		b /= 2
-		a = (a * a) % module
-	}
-	return result
-}
-
-func Fermat(n big.Int) bool {
-	z := new(big.Int)
-	a := new(big.Int)
-
-	z.SetString("0", 10)
-	if n.Cmp(z) < 0 {
-		return false
-	}
-
-	z.SetString("2", 10)
-	if n.Cmp(z) < 0 {
-		return true
-	}
-	for i := 0; i < 100; i++ {
-		// fmt.Println("Fermat n i", n, i)
-		a, _ = rand.Int(rand.Reader, &n)
-		if Pow(a, n-1, n) != 1 {
-			return false
-		}
-		if Gcd(a, n) != 1 {
-			return false
-		}
-	}
-	return true
-
-}
-
 func (r *Gost) Init() {
 	fmt.Println("Initialize")
-	r.P.SetString("4", 10)
+	r.P = 4
 	for !crypto.Fermat(r.P) {
 		r.Q = crypto.GenPrimeBounds(30000, 65536)
 		r.B = crypto.Random(30000, 65536)
